@@ -56,6 +56,7 @@
         android:layout_alignTop="@+id/auto_focus"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:checked="false" />
+        android:checked="false"
+        android:visibility="gone"/>
 
 </RelativeLayout>

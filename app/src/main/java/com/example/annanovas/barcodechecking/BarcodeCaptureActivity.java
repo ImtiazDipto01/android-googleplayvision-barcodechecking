@@ -33,6 +33,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -46,6 +47,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.CommonStatusCodes;
 
+import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
@@ -213,6 +215,40 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
         mCameraSource = builder
                 .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
                 .build();
+
+       /* barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
+            @Override
+            public void release() {
+
+            }
+
+            @Override
+            public void receiveDetections(Detector.Detections<Barcode> detections) {
+                final SparseArray<Barcode> barcodes = detections.getDetectedItems() ;
+                if(barcodes.size() > 0){
+                    Log.d("VALUE:", String.valueOf(barcodes.valueAt(0)));
+                }
+            }
+        });*/
+
+        BarcodeGraphic graphic = mGraphicOverlay.getFirstGraphic();
+        Barcode barcode = null;
+        if (graphic != null) {
+            barcode = graphic.getBarcode();
+            if (barcode != null) {
+                Intent data = new Intent();
+                data.putExtra(BarcodeObject, barcode);
+                setResult(CommonStatusCodes.SUCCESS, data);
+                finish();
+            }
+            else {
+                Log.d(TAG, "barcode data is null");
+            }
+        }
+        else {
+            Log.d(TAG,"no barcode detected");
+        }
+
     }
 
     /**
@@ -355,6 +391,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
         return barcode != null;
     }
 
+
     private class CaptureGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         @Override
@@ -362,6 +399,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
 
             return onTap(e.getRawX(), e.getRawY()) || super.onSingleTapConfirmed(e);
         }
+
     }
 
     private class ScaleListener implements ScaleGestureDetector.OnScaleGestureListener {
@@ -381,7 +419,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
          */
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            return false;
+            return false ;
         }
 
         /**
